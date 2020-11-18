@@ -1,5 +1,10 @@
-(require net/http-client)
-(require json)
+#lang racket/base
+
+(require racket/format
+         racket/match
+         racket/string
+         net/http-client
+         json)
 
 (define fname (getenv "AWS_LAMBDA_FUNCTION_NAME"))
 (define fver (getenv "AWS_LAMBDA_FUNCTION_VERSION"))
@@ -9,13 +14,15 @@
 (define handler-location (getenv "_HANDLER"))
 
 (define-values (handler-file handler-name)
-  (let ([h (string-split handler-location ":")])
-    (values (string-join (list (first h) ".rkt") "")
-            (string->symbol (last h)))))
+  (match (string-split handler-location ":")
+    [(list modname funcname)
+     (values (string-append modname ".rkt")
+             funcname)]))
 
 (define-values (endpoint port)
-  (let ([a (string-split api ":")])
-    (values (first a) (string->number (last a)))))
+  (match (string-split api ":")
+    [(list host port)
+     (values host (string->number port))]))
 
 (define (gen-event-context headers)
   (let ([hashed (make-hash
@@ -50,8 +57,7 @@
    #:port port
    #:data (cond
             [(void? outcome) ""]
-            [(hash? outcome)
-             (with-output-to-string (lambda () (write-json outcome)))]
+            [(hash? outcome) (jsexpr->string outcome)]
             [else (~a outcome)])
    #:method "POST"))
 
