@@ -150,7 +150,9 @@
 (define (make-aws-lambda-config-from-environment)
   (define-simple-macro (getenv-or-fail varname:str)
     (or (getenv varname)
-        (raise (exn:fail:aws-lambda:config (~a varname " not set")))))
+        (raise (exn:fail:aws-lambda:config
+                 (~a varname " not set")
+                 (current-continuation-marks)))))
   (define api-url
     (let ([u (getenv-or-fail "AWS_LAMBDA_RUNTIME_API")])
       (combine-url/relative (string->url u) runtime-api-version)))
@@ -199,7 +201,13 @@
   (aws-lambda-config service #f task-root handler-name))
 
 (module* main #f
-  (define cfg (make-aws-lambda-test-config "test-root" "bar:hello-world"))
+  (define-values (cfg runner)
+    (match (current-command-line-arguments)
+      [(vector "--test" task-root handler-name)
+       (values (make-aws-lambda-test-config task-root handler-name)
+               aws-lambda-run1)]
+      [_ (values (make-aws-lambda-config-from-environment)
+                 aws-lambda-run)]))
   (define handler (aws-lambda-initialize-handler cfg))
-  (aws-lambda-run1 cfg handler))
+  (runner cfg handler))
 
