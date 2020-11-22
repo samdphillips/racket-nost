@@ -1,4 +1,6 @@
 # System Files
 .DS_Store
+.*.swp
 Thumbs.db
+compiled/
 
