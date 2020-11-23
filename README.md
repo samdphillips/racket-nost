@@ -1,3 +1,20 @@
+# AWS Lambda Racket Runtime
+
+Racket implementation of the lambda runtime API. It uses a Minimal Racket distribution.
+
+This is forked from the work of https://github.com/kpiljoong/aws-lambda-racket
+.  This most likely *DOES NOT WORK* as-is since I started tearing out the
+plumbing and replacing the wallpaper.
+
+I am by no means a serverless/Lambda expert.  I just read the docss, reviewed
+some existing code, and wrote what made the most sense to me.  In fact I
+haven't tested this in AWS yet, maybe this week.
+
+Just wanted to get this out there so it doesn't gather dust like so many git repos
+sitting on my harddrive.
+
+# Original README.md follows
+
 ## AWS Lambda Racket Runtime
 
 Racket implementation of the lambda runtime API. It uses a Minimal Racket distribution.
